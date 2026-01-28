@@ -1,3 +1,5 @@
+"""Collect equity time series and compute technical indicators."""
+
 # Purpose: Gather Data on equities in the technology sector
 # Date: 5/11/2018
 
@@ -32,7 +34,7 @@ if not os.path.exists('data/equities_IT_TS/processed'):
 def calculate_avg_vol_for_interval(equity, days):
     equity['{}d Avg Vol'.format(days)] = equity['Volume'].rolling(window = days).mean()
 
-# Function to calculate simple moving average over a specified interval of days    
+# Function to calculate simple moving average over a specified interval of days
 def calculate_simple_moving_avg_for_interval(equity, days):
     equity['{}d SMA'.format(days)] = equity['Adj Close'].rolling(window = days).mean()
    
@@ -99,6 +101,7 @@ def calculate_chaikin_osc(equity):
     
 # Function to calculate technical indicators for an equity
 def calculate_indicators_for_equity(equity):
+    """Compute a standard set of technical indicators used by the model."""
     calculate_avg_vol_for_interval(equity, 5)
     calculate_avg_vol_for_interval(equity, 30)
     
@@ -113,6 +116,7 @@ def calculate_indicators_for_equity(equity):
     
     calculate_macd(equity, 12, 26, 9)
 
+    # Normalize short/long volume relationship
     equity['5d Avg Vol vs 30d Avg Vol'] = equity['5d Avg Vol'] / equity['30d Avg Vol']
     
     calculate_price_low_for_interval(equity, 30)
@@ -132,6 +136,7 @@ def calculate_indicators_for_equity(equity):
     
 # Define function to calculate response and create column for target label
 def calculate_target_label_for_interval(equity, days, threshold):
+    """Create a forward-looking return and classification label."""
     equity['{}d Pct Change'.format(days)] = (equity['Adj Close'].shift(-days) - equity['Adj Close']) / equity['Adj Close']
     equity['{}d Label'.format(days)] = [1 if x > threshold else -1 if x < -threshold else 0 for x in equity['{}d Pct Change'.format(days)]]
 
@@ -139,7 +144,7 @@ def calculate_target_label_for_interval(equity, days, threshold):
 start = dt.datetime(1977, 1, 1)
 end = dt.datetime(2017, 7, 31)
 
-# Collect time series data for all possible symbols and store it locally so it does not have to be re-pulled from yahoo
+# Collect time series data for all possible symbols and store it locally so it does not have to be re-pulled from Yahoo
 for symbol in symbols_IT:
     if not os.path.exists('data/equities_IT_TS/preprocessed/{}.csv'.format(symbol)):
         try:

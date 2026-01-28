@@ -1,17 +1,45 @@
 # Quantitative_Finance
-A Data Science project using Python in order to predict whether an equity in the IT sector has a positive growth or a negative growth.
-This project came into existence in order to gauge prevailing technical trading strategies on a large amount of historical data to determine the best performer. Performance is to be judged on the magnitude of return and consistency. The results can be used to build a statistically trained model that optimizes the chosen strategy's parameters for a selected trading period. The trading period can be defined as the time from entry (purchase of underlying security) to exit (sale of underlying security).
+This project builds a technical-indicator dataset for equities and trains baseline ML models to classify forward returns (positive, negative, or neutral) for a chosen horizon.
 
-Structure of executing this project:
+The workflow:
+1. Scrape or load equity symbols.
+2. Download historical prices for each symbol.
+3. Compute technical indicators and labels.
+4. Merge per-symbol CSVs into a single dataset.
+5. Train and evaluate baseline classification models.
 
-1. Create a folder called "data" in a location on your computer
-2. Place the StockSymbols_All file in the data folder
-3. Execute the Technical_indicators script
-4. This script will take a while to complete execution
-5. Notice that equities_IT_TS folder gets created which contains a preprocessed and a processed folder with the CSVs of each equity
-6. Place the merge_All_CSV script in both the preprocessed and processed folders and execute them individually (Change the name of the Final CSV to whatever you desire. Currently it is main.csv)
-7. Notice that a new csv with all the csv data is created
-8. Use this CSV as your dataset
-9. Execute the quantitative_finance script and make necessary changes
+## Requirements
+- Python 3.x
+- Install dependencies from requirements.txt
 
-Note: Find the poster depicting the performance comparison between the various models fitted on the dataset
+### Poetry (recommended)
+- Install Poetry and run: poetry install
+- Run scripts with: poetry run python <script>
+
+## Project Files
+- Technical_Indicators.py: Downloads data and computes indicators/labels.
+- Merge_All_CSV.py: Merges multiple CSVs into a single dataset.
+- Quantitative_finance.py: Trains and compares baseline models.
+- EquityCollection_UsingR.R: (Optional) Scrape equity symbols from ADVFN.
+
+## Setup
+1. Create a folder named data at the project root.
+2. Place StockSymbols_All.csv in data/.
+3. Run Technical_Indicators.py.
+4. The script creates data/equities_IT_TS/preprocessed and data/equities_IT_TS/processed.
+5. Copy Merge_All_CSV.py into each of those folders and run it to create main.csv.
+6. Use the merged CSV as your dataset for modeling.
+7. Run Quantitative_finance.py and adjust feature selection as needed.
+
+### Example
+- python Quantitative_finance.py --data main.csv --label "15d Label" --test-size 0.25
+- python Quantitative_finance.py --data main.csv --label "15d Label" --time-split --date-col Date --test-size 0.25 --log-level INFO
+
+## Notes
+- Data collection uses Yahoo as the source via pandas_datareader; some tickers may fail or be delisted.
+- The date range is set in Technical_Indicators.py and can be adjusted.
+- The label uses a forward return threshold and a fixed horizon (currently 15 days); adjust the threshold/horizon for your use case.
+- Use --time-split to avoid lookahead bias; requires a Date column in the dataset.
+
+## Poster
+See QuantitativeFinance_Poster.pdf for a performance comparison across models.
